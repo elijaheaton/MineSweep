@@ -4,10 +4,9 @@ from Game import Game
 size = 'small'
 
 if size == 'small':
-    game = Game(24)
+    game = Game(80)
 elif size == 'medium':
-    game = Game(81)
+    game = Game(252)
 
 if __name__ == '__main__':
     game.display_board()
-    print(game.find_pos(1,4))

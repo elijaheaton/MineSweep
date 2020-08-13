@@ -7,16 +7,20 @@ import numpy as np
 class Game:
 
     def __init__(self, num_tiles):
-        if num_tiles == 81:
-            self.tiles = (9, 9)
-            self.number_bombs = 20
+        if num_tiles == 80:
+            self.tiles = (8, 10)
+            self.number_bombs = 10
             self.board = np.zeros(self.tiles, dtype=int)
-        elif num_tiles == 24:
-            self.tiles = (4, 6)
-            self.number_bombs = 6
+        elif num_tiles == 252:
+            self.tiles = (14, 18)
+            self.number_bombs = 40
+            self.board = np.zeros(self.tiles, dtype=int)
+        elif num_tiles == 480:
+            self.tiles = (20, 24)
+            self.number_bombs = 99
             self.board = np.zeros(self.tiles, dtype=int)
         else:
-            print('We cannot support this number of tiles yet. Please try 81 or 24.')
+            print('We cannot support this number of tiles yet. Please try 80, 252, or 480.')
             exit(1)
 
         while np.sum(self.board) > -self.number_bombs:
