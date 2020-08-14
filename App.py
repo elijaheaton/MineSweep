@@ -29,129 +29,220 @@ class MyButton(Button):
             self.posy = 0
 
 
-class EasyMineSweepApp(App):
-    game = Game(80)
-    easy_layout = GridLayout(cols=10, padding=50)
-    end_popup = Popup(title='MineSweep',
-                      content=Label(text='Game Over'),
-                      size_hint=(None, None),
-                      size=(400, 400),
-                      pos_hint={'x': 0.375,
-                                'y': 0.3})
-    over = False
+# class EasyMineSweepApp(App):
+#     game = Game(80)
+#     easy_layout = GridLayout(cols=10, padding=50)
+#     end_popup = Popup(title='MineSweep',
+#                       content=Label(text='Game Over'),
+#                       size_hint=(None, None),
+#                       size=(400, 400),
+#                       pos_hint={'x': 0.375,
+#                                 'y': 0.3})
+#     over = False
+#
+#     def build(self):
+#
+#         l1 = Label(text='Tap once to flag,\ntwice to expose')
+#         l2 = Label(text='')
+#         l3 = Label(text='MineSweep')
+#         l4 = Label(text='Easy Level')
+#         l5 = Label(text='')
+#         l6 = Label(text='10 Bombs')
+#
+#         self.easy_layout.add_widget(l1)
+#         self.easy_layout.add_widget(l2)
+#         self.easy_layout.add_widget(l3)
+#         self.easy_layout.add_widget(l4)
+#         self.easy_layout.add_widget(l5)
+#         for i in range(4):
+#             self.easy_layout.add_widget(Label(text=''))
+#         self.easy_layout.add_widget(l6)
+#
+#         btn = []
+#         for i in range(80):
+#             btn.append(MyButton(i, 80))
+#             btn[i].bind(on_press=self.reveal)
+#             self.easy_layout.add_widget(btn[i])
+#
+#         for i in range(9):
+#             self.easy_layout.add_widget(Label(text=''))
+#         reset_button = Button(text='Menu',
+#                               on_press=self.return_menu,
+#                               background_color=[0, 0, 0, 0])
+#         self.easy_layout.add_widget(reset_button)
+#
+#         return self.easy_layout
+#
+#     def reveal(self, instance):
+#         if not self.over:
+#             if instance.text == '':
+#                 instance.text = 'FLAGGED'
+#             else:
+#                 answer = self.game.find_pos(instance.posx, instance.posy)
+#                 if answer == -1:
+#                     instance.text = 'BOOM!'
+#                     self.game_over()
+#                 else:
+#                     instance.text = str(answer)
+#
+#     def game_over(self):
+#         self.over = True
+#         self.end_popup.open()
+#
+#     def return_menu(self, _):
+#         self.easy_layout.clear_widgets()
+        # self.stop()
+        # MineSweepApp().run()
+
+
+# class MediumMineSweepApp(App):
+#     game = Game(252)
+#     medium_layout = GridLayout(cols=18, padding=50)
+    # end_popup = Popup(title='MineSweep',
+    #                   content=Label(text='Game Over'),
+    #                   size_hint=(None, None),
+    #                   size=(400, 400),
+    #                   pos_hint={'x': 0.375,
+    #                             'y': 0.3})
+    # over = False
+    # flag_count = None
+    #
+    # def build(self):
+    #
+    #     l1 = Label(text='Tap once to flag,\ntwice to expose')
+    #     l2 = Label(text='')
+    #     l3 = Label(text='')
+    #     l4 = Label(text='MineSweeper')
+    #     l5 = Label(text='')
+    #     l6 = Label(text='Medium Level')
+    #     l7 = Label(text='')
+    #     l8 = Label(text='')
+    #     self.flag_count = Label(text='40')
+    #
+    #     self.medium_layout.add_widget(l1)
+    #     self.medium_layout.add_widget(l2)
+    #     self.medium_layout.add_widget(l3)
+    #     self.medium_layout.add_widget(l4)
+    #     self.medium_layout.add_widget(l5)
+    #     self.medium_layout.add_widget(l6)
+    #     self.medium_layout.add_widget(l7)
+    #     self.medium_layout.add_widget(l8)
+    #     for i in range(8):
+    #         self.medium_layout.add_widget(Label(text=''))
+    #     self.medium_layout.add_widget(self.flag_count)
+    #     self.medium_layout.add_widget(Label(text='Bombs'))
+    #
+    #     btn = []
+    #     for i in range(252):
+    #         btn.append(MyButton(i, 252))
+    #         btn[i].bind(on_press=self.reveal)
+    #         self.medium_layout.add_widget(btn[i])
+    #
+    #     for i in range(8):
+    #         self.medium_layout.add_widget(Label(text=''))
+    #     reset_button = Button(text='Menu',
+    #                           on_press=self.return_menu,
+    #                           background_color=[0, 0, 0, 0])
+    #     self.medium_layout.add_widget(reset_button)
+    #
+    #     return self.medium_layout
+    #
+    # def reveal(self, instance):
+    #     if not self.over:
+    #         if instance.text == '':
+    #             instance.text = 'F'
+    #             f_count = int(self.flag_count.text)
+    #             self.flag_count.text = str(f_count - 1)
+    #         else:
+    #             answer = self.game.find_pos(instance.posx, instance.posy)
+    #             if answer == -1:
+    #                 instance.text = 'BOOM!'
+    #                 self.game_over()
+    #             else:
+    #                 instance.text = str(answer)
+    #                 f_count = int(self.flag_count.text)
+    #                 self.flag_count.text = str(f_count + 1)
+    #
+    # def game_over(self):
+    #     self.over = True
+    #     self.end_popup.open()
+    #
+    # def return_menu(self, _):
+    #     self.medium_layout.clear_widgets()
+    #     self.stop()
+    #     MineSweepApp().run()
+
+
+class PlayMineSweep(App):
+    def __init__(self, number_tiles):
+        super().__init__()
+        self.game = Game(number_tiles)
+        self.number_tiles = number_tiles
+        if number_tiles == 80:
+            self.header_spaces = 2
+            self.number_cols = 10
+            self.difficulty = 'Easy'
+        elif number_tiles == 252:
+            self.header_spaces = 6
+            self.number_cols = 18
+            self.difficulty = 'Medium'
+        elif number_tiles == 480:
+            self.header_spaces = 9
+            self.number_cols = 24
+            self.difficulty = 'Hard'
+        else:
+            return
+
+        self.layout = GridLayout(cols=self.number_cols, padding=50)
+        self.end_popup = Popup(title='MineSweep',
+                               content=Label(text='Game Over'),
+                               size_hint=(None, None),
+                               size=(400, 400),
+                               pos_hint={'x': 0.375,
+                                         'y': 0.3})
+        self.over = False
+        self.flag_count = None
 
     def build(self):
 
-        l1 = Label(text='Tap once to flag,\ntwice to expose')
-        l2 = Label(text='')
-        l3 = Label(text='MineSweep')
-        l4 = Label(text='Easy Level')
-        l5 = Label(text='')
-        l6 = Label(text='10 Bombs')
-
-        self.easy_layout.add_widget(l1)
-        self.easy_layout.add_widget(l2)
-        self.easy_layout.add_widget(l3)
-        self.easy_layout.add_widget(l4)
-        self.easy_layout.add_widget(l5)
-        for i in range(4):
-            self.easy_layout.add_widget(Label(text=''))
-        self.easy_layout.add_widget(l6)
-
-        btn = []
-        for i in range(80):
-            btn.append(MyButton(i, 80))
-            btn[i].bind(on_press=self.reveal)
-            self.easy_layout.add_widget(btn[i])
-
-        for i in range(9):
-            self.easy_layout.add_widget(Label(text=''))
-        reset_button = Button(text='Menu',
-                              on_press=self.return_menu,
-                              background_color=[0, 0, 0, 0])
-        self.easy_layout.add_widget(reset_button)
-
-        return self.easy_layout
-
-    def reveal(self, instance):
-        if not self.over:
-            if instance.text == '':
-                instance.text = 'FLAGGED'
-            else:
-                answer = self.game.find_pos(instance.posx, instance.posy)
-                if answer == -1:
-                    instance.text = 'BOOM!'
-                    self.game_over()
-                else:
-                    instance.text = str(answer)
-
-    def game_over(self):
-        self.over = True
-        self.end_popup.open()
-
-    def return_menu(self, _):
-        self.easy_layout.clear_widgets()
-        self.stop()
-        MineSweepApp().run()
-
-
-class MediumMineSweepApp(App):
-    game = Game(252)
-    medium_layout = GridLayout(cols=18, padding=50)
-    end_popup = Popup(title='MineSweep',
-                      content=Label(text='Game Over'),
-                      size_hint=(None, None),
-                      size=(400, 400),
-                      pos_hint={'x': 0.375,
-                                'y': 0.3})
-    over = False
-    flag_count = None
-
-    def build(self):
-
-        l1 = Label(text='Tap once to flag,\ntwice to expose')
-        l2 = Label(text='')
-        l3 = Label(text='')
-        l4 = Label(text='MineSweeper')
-        l5 = Label(text='')
-        l6 = Label(text='Medium Level')
-        l7 = Label(text='')
-        l8 = Label(text='')
+        l1 = Label(text='Tap once to flag,')
+        l2 = Label(text='twice to expose')
+        l3 = Label(text='MineSweeper')
+        l4 = Label(text='%s Level' % self.difficulty)
         self.flag_count = Label(text='40')
+        l5 = Label(text='Bombs')
 
-        self.medium_layout.add_widget(l1)
-        self.medium_layout.add_widget(l2)
-        self.medium_layout.add_widget(l3)
-        self.medium_layout.add_widget(l4)
-        self.medium_layout.add_widget(l5)
-        self.medium_layout.add_widget(l6)
-        self.medium_layout.add_widget(l7)
-        self.medium_layout.add_widget(l8)
-        for i in range(8):
-            self.medium_layout.add_widget(Label(text=''))
-        self.medium_layout.add_widget(self.flag_count)
-        self.medium_layout.add_widget(Label(text='Bombs'))
+        self.layout.add_widget(l1)
+        self.layout.add_widget(l2)
+        for i in range(self.header_spaces):
+            self.layout.add_widget(Label())
+        self.layout.add_widget(l3)
+        self.layout.add_widget(l4)
+        for i in range(self.header_spaces):
+            self.layout.add_widget(Label())
+        self.layout.add_widget(self.flag_count)
+        self.layout.add_widget(l5)
 
         btn = []
-        for i in range(252):
-            btn.append(MyButton(i, 252))
+        for i in range(self.number_tiles):
+            btn.append(MyButton(i, self.number_tiles))
             btn[i].bind(on_press=self.reveal)
-            self.medium_layout.add_widget(btn[i])
+            self.layout.add_widget(btn[i])
 
-        for i in range(8):
-            self.medium_layout.add_widget(Label(text=''))
-        reset_button = Button(text='Menu',
-                              on_press=self.return_menu,
-                              background_color=[0, 0, 0, 0])
-        self.medium_layout.add_widget(reset_button)
+        for i in range(self.number_cols - 1):
+            self.layout.add_widget(Label(text=''))
+        menu = Button(text='Menu',
+                      on_press=self.return_menu,
+                      background_color=[0, 0, 0, 0])
+        self.layout.add_widget(menu)
 
-        return self.medium_layout
+        return self.layout
 
     def reveal(self, instance):
         if not self.over:
+            f_count = int(self.flag_count.text)
             if instance.text == '':
                 instance.text = 'F'
-                f_count = int(self.flag_count.text)
                 self.flag_count.text = str(f_count - 1)
             else:
                 answer = self.game.find_pos(instance.posx, instance.posy)
@@ -160,7 +251,6 @@ class MediumMineSweepApp(App):
                     self.game_over()
                 else:
                     instance.text = str(answer)
-                    f_count = int(self.flag_count.text)
                     self.flag_count.text = str(f_count + 1)
 
     def game_over(self):
@@ -168,7 +258,7 @@ class MediumMineSweepApp(App):
         self.end_popup.open()
 
     def return_menu(self, _):
-        self.medium_layout.clear_widgets()
+        self.layout.clear_widgets()
         self.stop()
         MineSweepApp().run()
 
@@ -204,9 +294,13 @@ class MineSweepApp(App):
     def choose_level(self, event):
         self.layout.clear_widgets()
         if event.text == 'Easy':
-            EasyMineSweepApp().run()
+            PlayMineSweep(80).run()
         elif event.text == 'Medium':
-            MediumMineSweepApp().run()
+            PlayMineSweep(252).run()
+        elif event.text == 'Hard':
+            PlayMineSweep(480).run()
+        else:
+            print('Error. Not a button option.')
 
 
 if __name__ == '__main__':
