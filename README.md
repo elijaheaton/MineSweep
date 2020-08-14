@@ -7,6 +7,4 @@ TODO: Make it so that you can win
 
 TODO: Change colors based on the number revealed
 
-TODO: Make a recursive function to eliminate all neighbors of buttons revealed to be 0's
-
 TODO: Make headers readable

@@ -35,7 +35,7 @@ class Game:
         #    of coordinates
 
         def find_number(posx, posy):
-            main_box = self.board[posx][posy]
+            # main_box = self.board[posx][posy]
             to_place = 0
             neighbors = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
 

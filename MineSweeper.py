@@ -10,3 +10,8 @@ elif size == 'medium':
 
 if __name__ == '__main__':
     game.display_board()
+    print(game.find_pos(7,9))
+    print('\n\n')
+    for i in range(10):
+        print(i)
+    # down four over five
