@@ -95,12 +95,8 @@ class PlayMineSweep(App):
             return
 
         self.layout = GridLayout(cols=self.number_cols, padding=50)
-        self.end_popup = Popup(title='MineSweep',
-                               content=Label(text='Game Over'),
-                               size_hint=(None, None),
-                               size=(400, 400),
-                               pos_hint={'x': 0.375,
-                                         'y': 0.3})
+        self.end_label = Label(text='Game Over')
+        self.end_popup = None
         self.over = False
         self.flag_count = None
         self.btn = []
@@ -158,6 +154,9 @@ class PlayMineSweep(App):
                         self.zero_recursion(instance.position)
                     self.flag_count.text = str(f_count + 1)
 
+                    if self.detect_win():
+                        self.win()
+
     def zero_recursion(self, index):
         # Find all neighbors if instance is a zero
         if self.btn[index].text == '\n':
@@ -177,7 +176,40 @@ class PlayMineSweep(App):
 
     def game_over(self):
         self.over = True
+        for block in self.btn:
+            check = self.game.find_pos(block.posx, block.posy)
+            if check == -1:
+                if block.text == 'F':
+                    block.text = 'B'
+                else:
+                    block.text = 'b'
+        self.make_end_popup()
         self.end_popup.open()
+
+    def detect_win(self):
+        win = False
+        for block in self.btn:
+            check = self.game.find_pos(block.posx, block.posy)
+            if check == -1 or (check != -1 and block.text != ''):
+                win = True
+            else:
+                win = False
+                break
+        return win
+
+    def win(self):
+        self.over = True
+        self.end_label = Label(text='You Won!!')
+        self.make_end_popup()
+        self.end_popup.open()
+
+    def make_end_popup(self):
+        self.end_popup = Popup(title='MineSweep',
+                               content=self.end_label,
+                               size_hint=(None, None),
+                               size=(400, 400),
+                               pos_hint={'x': 0.375,
+                                         'y': 0.3})
 
     def return_menu(self, _):
         self.layout.clear_widgets()
