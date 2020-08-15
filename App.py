@@ -31,7 +31,6 @@ class MyButton(Button):
 
 def change_color(block):
     t = block.text
-    print(t)
     if t == '0':
         c = [0.999, 0.999, 0.999, 0.5]  # Dark Gray
         block.text = '\n'
@@ -139,10 +138,10 @@ class PlayMineSweep(App):
     def reveal(self, instance):
         if not self.over:
             f_count = int(self.flag_count.text)
-            if instance.text == '' and instance.text != '\n':
+            if instance.text == '':
                 instance.text = 'F'
                 self.flag_count.text = str(f_count - 1)
-            else:
+            elif instance.text == 'F':
                 answer = self.game.find_pos(instance.posx, instance.posy)
                 if answer == -1:
                     instance.text = '!'
@@ -156,6 +155,8 @@ class PlayMineSweep(App):
 
                     if self.detect_win():
                         self.win()
+            else:  # Not blank and not flagged
+                self.triple_hit(instance.position)
 
     def zero_recursion(self, index):
         # Find all neighbors if instance is a zero
@@ -173,6 +174,37 @@ class PlayMineSweep(App):
                             # Then, if the instance is a zero, do the recursion
                             if self.btn[index + x[2]].text == '\n':
                                 self.zero_recursion(index + x[2])
+
+    def triple_hit(self, index):
+        print('starting triple threat')
+        match = self.btn[index].text
+        n_F = 0
+        n_blank = 0
+        box_neighbors = []
+        # if number of flags on neighbor blocks == match, destroy all other blocks
+        for x in self.neighbors:
+            check_box = (x[0] + self.btn[index].posx, x[1] + self.btn[index].posy)
+            # Now let's check that check_box is on the board
+            if check_box[0] in range(self.number_rows):
+                if check_box[1] in range(self.number_cols):
+                    # Now we know it's on the board
+                    b = self.btn[index + x[2]]
+                    if b.text == 'F':
+                        n_F += 1
+                    elif b.text == '':
+                        n_blank += 1
+                        box_neighbors.append(b)
+
+        print('match: ', match, ', n_F: ', n_F, ", n_blank: ", n_blank)
+        # Match has to be a number, that number has to match match, and there have to be blanks
+        if match != '\n' and n_F == int(match) and n_blank:
+            # Then we get rid of all blank neighbors
+            print('hacked into the mainframe')
+            for neighbor in box_neighbors:
+                print(neighbor)
+                # Let's double tap
+                for _ in range(2):
+                    self.reveal(neighbor)
 
     def game_over(self):
         self.over = True
@@ -199,6 +231,7 @@ class PlayMineSweep(App):
 
     def win(self):
         self.over = True
+        self.flag_count.text = '0'
         self.end_label = Label(text='You Won!!')
         self.make_end_popup()
         self.end_popup.open()
