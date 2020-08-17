@@ -1,6 +1,5 @@
 from kivy.config import Config
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
-
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
@@ -93,7 +92,9 @@ class PlayMineSweep(App):
         else:
             return
 
-        self.layout = GridLayout(cols=self.number_cols, padding=50)
+        self.entire_layout = GridLayout(rows=2, padding=50, row_default_height=40, spacing=[0, -800])
+        self.header_layout = GridLayout(cols=3, row_force_default=True, row_default_height=40)
+        self.content_layout = GridLayout(cols=self.number_cols)
         self.end_label = Label(text='Game Over')
         self.end_popup = None
         self.over = False
@@ -103,6 +104,7 @@ class PlayMineSweep(App):
     def build(self):
         self.title = 'MineSweep'
 
+        # make the header layout
         l1 = Label(text='Tap once to flag,')
         l2 = Label(text='twice to expose')
         l3 = Label(text='MineSweeper')
@@ -110,30 +112,31 @@ class PlayMineSweep(App):
         self.flag_count = Label(text=str(self.number_bombs))
         l5 = Label(text='Bombs')
 
-        self.layout.add_widget(l1)
-        self.layout.add_widget(l2)
-        for i in range(self.header_spaces):
-            self.layout.add_widget(Label())
-        self.layout.add_widget(l3)
-        self.layout.add_widget(l4)
-        for i in range(self.header_spaces):
-            self.layout.add_widget(Label())
-        self.layout.add_widget(self.flag_count)
-        self.layout.add_widget(l5)
+        self.header_layout.add_widget(l1)
+        self.header_layout.add_widget(l3)
+        #self.header_layout.add_widget(Label())
+        self.header_layout.add_widget(self.flag_count)
+        self.header_layout.add_widget(l2)
+        #self.header_layout.add_widget(Label())
+        self.header_layout.add_widget(l4)
+        self.header_layout.add_widget(l5)
 
+        # and make the content layout
         for i in range(self.number_tiles):
             self.btn.append(MyButton(i, self.number_tiles))
             self.btn[i].bind(on_press=self.reveal)
-            self.layout.add_widget(self.btn[i])
+            self.content_layout.add_widget(self.btn[i])
 
         for i in range(self.number_cols - 1):
-            self.layout.add_widget(Label(text=''))
+            self.content_layout.add_widget(Label(text=''))
         menu = Button(text='Menu',
                       on_press=self.return_menu,
                       background_color=[0, 0, 0, 0])
-        self.layout.add_widget(menu)
+        self.content_layout.add_widget(menu)
 
-        return self.layout
+        self.entire_layout.add_widget(self.header_layout)
+        self.entire_layout.add_widget(self.content_layout)
+        return self.entire_layout
 
     def reveal(self, instance):
         if not self.over:
@@ -195,11 +198,9 @@ class PlayMineSweep(App):
                         n_blank += 1
                         box_neighbors.append(b)
 
-        print('match: ', match, ', n_F: ', n_F, ", n_blank: ", n_blank)
         # Match has to be a number, that number has to match match, and there have to be blanks
         if match != '\n' and n_F == int(match) and n_blank:
             # Then we get rid of all blank neighbors
-            print('hacked into the mainframe')
             for neighbor in box_neighbors:
                 print(neighbor)
                 # Let's double tap
@@ -245,7 +246,7 @@ class PlayMineSweep(App):
                                          'y': 0.3})
 
     def return_menu(self, _):
-        self.layout.clear_widgets()
+        self.entire_layout.clear_widgets()
         self.stop()
         MineSweepApp().run()
 

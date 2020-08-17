@@ -3,7 +3,7 @@ A quick and incomplete MineSweeper game made with the Kivy API
 
 TODO: Explain dependencies and how to play
 
-TODO: Make headers readable, by making child grids in Kivy
+TODO: Don't allow user to change Kivy App window size
 
 TODO: Make pictures instead of markers that say F, B, and b
 
