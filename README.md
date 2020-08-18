@@ -1,8 +1,17 @@
 # MineSweep
-A quick and incomplete MineSweeper game made with the Kivy API
+A MineSweeper game made with the Kivy API
 
-TODO: Explain dependencies and how to play
+To play, you will need to install Kivy and Numpy. While numpy 
+can work with the latest version of Python (3.8), Kivy cannot. 
+So you will need to revert to 3.7 for this game.
 
-TODO: Make sure bomb count is always accurate
+The easiest way to do this would be to activate a virtual 
+environment. For example, you can download Anaconda. If you
+do, you will be able to use the following commands:
 
-TODO: Ensure that MineSweep can be played on different OSes
+conda create -n minesweep python=3.7
+conda activate minesweep
+pip install kivy
+pip install numpy
+git clone https://github.com/elijaheaton/MineSweep.git
+python MineSweep/MineSweep.py

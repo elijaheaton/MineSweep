@@ -279,7 +279,7 @@ class PlayMineSweep(App):
         self.end_popup = Popup(title='MineSweep',
                                content=self.end_label,
                                size_hint=(None, None),
-                               size=(400, 400),
+                               size=(self.entire_layout.width / 4, self.entire_layout.width / 4),
                                pos_hint={'x': 0.375,
                                          'y': 0.3})
 
