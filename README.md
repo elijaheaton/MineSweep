@@ -3,8 +3,6 @@ A quick and incomplete MineSweeper game made with the Kivy API
 
 TODO: Explain dependencies and how to play
 
-TODO: Don't allow user to change Kivy App window size
+TODO: Make sure bomb count is always accurate
 
-TODO: Make pictures instead of markers that say F, B, and b
-
-TODO: Add restart button so you don't have to go to menu and back just to restart
+TODO: Ensure that MineSweep can be played on different OSes

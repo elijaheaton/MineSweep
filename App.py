@@ -1,11 +1,13 @@
 from kivy.config import Config
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
+Config.set('graphics', 'resizable', False)
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
-from Game import Game
+from kivy.uix.image import Image
+from MineSweep.Game import Game
 import numpy as np
 
 
@@ -13,6 +15,7 @@ class MyButton(Button):
     def __init__(self, position, size):
         Button.__init__(self)
         self.position = position
+        self.image = None
 
         if size == 80:
             self.posx = int(np.floor(position / 10))
@@ -92,6 +95,9 @@ class PlayMineSweep(App):
         else:
             return
 
+        self.flag_source = './icons/flag.png'
+        self.bomb_source = './icons/bomb.png'
+        self.explosion_source = './icons/explosion.png'
         self.entire_layout = GridLayout(rows=2, padding=50, row_default_height=40, spacing=[0, -800])
         self.header_layout = GridLayout(cols=3, row_force_default=True, row_default_height=40)
         self.content_layout = GridLayout(cols=self.number_cols)
@@ -114,10 +120,8 @@ class PlayMineSweep(App):
 
         self.header_layout.add_widget(l1)
         self.header_layout.add_widget(l3)
-        #self.header_layout.add_widget(Label())
         self.header_layout.add_widget(self.flag_count)
         self.header_layout.add_widget(l2)
-        #self.header_layout.add_widget(Label())
         self.header_layout.add_widget(l4)
         self.header_layout.add_widget(l5)
 
@@ -127,7 +131,11 @@ class PlayMineSweep(App):
             self.btn[i].bind(on_press=self.reveal)
             self.content_layout.add_widget(self.btn[i])
 
-        for i in range(self.number_cols - 1):
+        restart = Button(text='Restart',
+                         on_press=self.restart,
+                         background_color=[0, 0, 0, 0])
+        self.content_layout.add_widget(restart)
+        for i in range(self.number_cols - 2):
             self.content_layout.add_widget(Label(text=''))
         menu = Button(text='Menu',
                       on_press=self.return_menu,
@@ -141,16 +149,18 @@ class PlayMineSweep(App):
     def reveal(self, instance):
         if not self.over:
             f_count = int(self.flag_count.text)
-            if instance.text == '':
-                instance.text = 'F'
-                self.flag_count.text = str(f_count - 1)
-            elif instance.text == 'F':
+            # if the image is not None, it must be a flag
+            if instance.image is not None:
                 answer = self.game.find_pos(instance.posx, instance.posy)
                 if answer == -1:
-                    instance.text = '!'
+                    instance.remove_widget(instance.image)
+                    instance.image = Image(source=self.explosion_source, pos=instance.pos, size=instance.size)
+                    instance.add_widget(instance.image)
                     self.game_over()
                 else:
                     instance.text = str(answer)
+                    instance.remove_widget(instance.image)
+                    instance.image = None
                     change_color(instance)
                     if not answer:
                         self.zero_recursion(instance.position)
@@ -158,6 +168,11 @@ class PlayMineSweep(App):
 
                     if self.detect_win():
                         self.win()
+            elif instance.text == '':
+                instance.image = Image(source=self.flag_source, pos=instance.pos, size=instance.size)
+                instance.add_widget(instance.image)
+
+                self.flag_count.text = str(f_count - 1)
             else:  # Not blank and not flagged
                 self.triple_hit(instance.position)
 
@@ -169,19 +184,19 @@ class PlayMineSweep(App):
                 # Now let's check that check_box is on the board
                 if check_box[0] in range(self.number_rows):
                     if check_box[1] in range(self.number_cols):
-                        if self.btn[index + x[2]].text == '':
+                        b = self.btn[index + x[2]]
+                        if b.text == '' and b.image is None:
                             # First reveal the instance of MyButton()
                             # Right now, we have to reveal twice
                             for _ in range(2):
-                                self.reveal(self.btn[index + x[2]])
+                                self.reveal(b)
                             # Then, if the instance is a zero, do the recursion
-                            if self.btn[index + x[2]].text == '\n':
+                            if b.text == '\n':
                                 self.zero_recursion(index + x[2])
 
     def triple_hit(self, index):
-        print('starting triple threat')
         match = self.btn[index].text
-        n_F = 0
+        n_flag = 0
         n_blank = 0
         box_neighbors = []
         # if number of flags on neighbor blocks == match, destroy all other blocks
@@ -192,17 +207,16 @@ class PlayMineSweep(App):
                 if check_box[1] in range(self.number_cols):
                     # Now we know it's on the board
                     b = self.btn[index + x[2]]
-                    if b.text == 'F':
-                        n_F += 1
+                    if b.image is not None:
+                        n_flag += 1
                     elif b.text == '':
                         n_blank += 1
                         box_neighbors.append(b)
 
-        # Match has to be a number, that number has to match match, and there have to be blanks
-        if match != '\n' and n_F == int(match) and n_blank:
+        # Match has to be a number, that number has to match flag count, and there have to be blanks
+        if match != '\n' and n_flag == int(match) and n_blank:
             # Then we get rid of all blank neighbors
             for neighbor in box_neighbors:
-                print(neighbor)
                 # Let's double tap
                 for _ in range(2):
                     self.reveal(neighbor)
@@ -212,10 +226,15 @@ class PlayMineSweep(App):
         for block in self.btn:
             check = self.game.find_pos(block.posx, block.posy)
             if check == -1:
-                if block.text == 'F':
-                    block.text = 'B'
+                # Now they must either have a bomb or explosion
+                if block.image is not None:
+                    if block.image.source != self.explosion_source:
+                        block.remove_widget(block.image)
+                        block.image = Image(source=self.bomb_source, pos=block.pos, size=block.size)
+                        block.add_widget(block.image)
                 else:
-                    block.text = 'b'
+                    block.image = Image(source=self.bomb_source, pos=block.pos, size=block.size)
+                    block.add_widget(block.image)
         self.make_end_popup()
         self.end_popup.open()
 
@@ -244,6 +263,12 @@ class PlayMineSweep(App):
                                size=(400, 400),
                                pos_hint={'x': 0.375,
                                          'y': 0.3})
+
+    def restart(self, _):
+        nt = self.number_tiles
+        self.entire_layout.clear_widgets()
+        self.stop()
+        PlayMineSweep(nt).run()
 
     def return_menu(self, _):
         self.entire_layout.clear_widgets()
@@ -277,6 +302,7 @@ class MineSweepApp(App):
         self.layout.add_widget(easy)
         self.layout.add_widget(medium)
         self.layout.add_widget(hard)
+
         return self.layout
 
     def choose_level(self, event):
