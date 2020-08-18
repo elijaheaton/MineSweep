@@ -1,4 +1,5 @@
 from kivy.config import Config
+
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 Config.set('graphics', 'resizable', False)
 from kivy.app import App
@@ -7,7 +8,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.image import Image
-from MineSweep.Game import Game
+from Game import Game
 import numpy as np
 
 
@@ -98,9 +99,10 @@ class PlayMineSweep(App):
         self.flag_source = './icons/flag.png'
         self.bomb_source = './icons/bomb.png'
         self.explosion_source = './icons/explosion.png'
-        self.entire_layout = GridLayout(rows=2, padding=50, row_default_height=40, spacing=[0, -800])
-        self.header_layout = GridLayout(cols=3, row_force_default=True, row_default_height=40)
-        self.content_layout = GridLayout(cols=self.number_cols)
+        self.entire_layout = GridLayout(cols=1, padding=50)
+        self.header_layout = GridLayout(cols=3, size_hint_y=1.5)
+        self.content_layout = GridLayout(cols=self.number_cols, size_hint_y=12)
+        self.footer_layout = GridLayout(cols=3, size_hint_y=0.75)
         self.end_label = Label(text='Game Over')
         self.end_popup = None
         self.over = False
@@ -111,9 +113,9 @@ class PlayMineSweep(App):
         self.title = 'MineSweep'
 
         # make the header layout
-        l1 = Label(text='Tap once to flag,')
-        l2 = Label(text='twice to expose')
-        l3 = Label(text='MineSweeper')
+        l1 = Label(text='Tap right to flag,')
+        l2 = Label(text='left to expose')
+        l3 = Label(text='MineSweep')
         l4 = Label(text='%s Level' % self.difficulty)
         self.flag_count = Label(text=str(self.number_bombs))
         l5 = Label(text='Bombs')
@@ -128,23 +130,39 @@ class PlayMineSweep(App):
         # and make the content layout
         for i in range(self.number_tiles):
             self.btn.append(MyButton(i, self.number_tiles))
-            self.btn[i].bind(on_press=self.reveal)
+            self.btn[i].bind(on_touch_down=self.handle_reveal)
             self.content_layout.add_widget(self.btn[i])
 
+        # finally, let's make the footer layout
         restart = Button(text='Restart',
                          on_press=self.restart,
                          background_color=[0, 0, 0, 0])
-        self.content_layout.add_widget(restart)
-        for i in range(self.number_cols - 2):
-            self.content_layout.add_widget(Label(text=''))
+        self.footer_layout.add_widget(restart)
+        self.footer_layout.add_widget(Label())
         menu = Button(text='Menu',
                       on_press=self.return_menu,
                       background_color=[0, 0, 0, 0])
-        self.content_layout.add_widget(menu)
+        self.footer_layout.add_widget(menu)
 
         self.entire_layout.add_widget(self.header_layout)
         self.entire_layout.add_widget(self.content_layout)
+        self.entire_layout.add_widget(self.footer_layout)
         return self.entire_layout
+
+    def handle_reveal(self, instance, touch):
+        if not self.over:
+            if instance.collide_point(touch.x, touch.y):
+                if touch.button == 'right' and instance.image is not None:
+                    self.remove_flag(instance)
+                else:
+                    if touch.button == 'left':
+                        self.reveal(instance)
+                    self.reveal(instance)
+
+    def remove_flag(self, instance):
+        self.flag_count.text = str(int(self.flag_count.text) + 1)
+        instance.remove_widget(instance.image)
+        instance.image = None
 
     def reveal(self, instance):
         if not self.over:
@@ -235,6 +253,7 @@ class PlayMineSweep(App):
                 else:
                     block.image = Image(source=self.bomb_source, pos=block.pos, size=block.size)
                     block.add_widget(block.image)
+        self.flag_count.text = '0'
         self.make_end_popup()
         self.end_popup.open()
 
@@ -277,7 +296,6 @@ class PlayMineSweep(App):
 
 
 class MineSweepApp(App):
-
     layout = GridLayout(cols=3, padding=40)
 
     def build(self):
